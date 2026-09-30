@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Registration & Result Portal</title>
+<style>
+  /* ---------- Base & variables ---------- */
+  :root {
+    --ink: #12263a;
+    --ink-soft: #4a5b6c;
+    --paper: #f3f6f9;
+    --card: #ffffff;
+    --line: #d5dde5;
+    --brand: #0d6e6e;
+    --brand-dark: #0a5454;
+    --pass-bg: #e3f5ea;  --pass-fg: #146c3a;
+    --fail-bg: #fde8e6;  --fail-fg: #a52a20;
+    --warn-bg: #fff4dc;  --warn-fg: #8a5a00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  /* ---------- Header & navigation ---------- */
+  header { background: var(--ink); color: #fff; }
+  .bar {
+    max-width: 1100px; margin: auto; padding: 16px 20px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .bar h1 { font-size: 1.3rem; font-weight: 600; }
+  nav a {
+    color: #cfe3e3; text-decoration: none; margin-left: 18px; padding-bottom: 3px;
+    border-bottom: 2px solid transparent;
+  }
+  nav a:hover, nav a:focus { color: #fff; border-color: #5fc4c4; outline: none; }
+
+  /* ---------- Layout (Grid) ---------- */
+  main {
+    max-width: 1100px; margin: 28px auto; padding: 0 20px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;
+  }
+  section {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 24px;
+  }
+  section h2 { font-size: 1.15rem; margin-bottom: 4px; }
+  .hint { color: var(--ink-soft); font-size: .9rem; margin-bottom: 18px; }
+
+  /* ---------- Form ---------- */
+  fieldset { border: none; margin-bottom: 20px; }
+  legend { font-weight: 600; margin-bottom: 10px; color: var(--brand-dark); }
+  .row { display: flex; flex-wrap: wrap; gap: 14px; }   /* Flexbox */
+  .field { flex: 1 1 200px; display: flex; flex-direction: column; margin-bottom: 12px; }
+  label { font-size: .88rem; font-weight: 600; margin-bottom: 4px; }
+  input, select {
+    padding: 9px 10px; font: inherit; color: var(--ink);
+    border: 1.5px solid var(--line); border-radius: 6px; background: #fff;
+  }
+  input:focus, select:focus { outline: 3px solid #b6e0e0; border-color: var(--brand); }
+  input:valid:not(:placeholder-shown) { border-color: #3aa76d; }
+  input:invalid:not(:placeholder-shown) { border-color: #d64a3d; }
+  small { color: var(--ink-soft); font-size: .78rem; margin-top: 3px; }
+
+  .buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-weight: 600; padding: 10px 22px; border-radius: 6px;
+    border: 1.5px solid var(--brand); cursor: pointer; transition: background .15s;
+  }
+  .primary { background: var(--brand); color: #fff; }
+  .primary:hover { background: var(--brand-dark); }
+  .secondary { background: #fff; color: var(--brand); }
+  .secondary:hover { background: #e8f4f4; }
+  button:focus-visible { outline: 3px solid #b6e0e0; outline-offset: 2px; }
+
+  /* ---------- Result card ---------- */
+  .empty { background: var(--warn-bg); color: var(--warn-fg); padding: 14px; border-radius: 8px; }
+  .profile { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin-bottom: 18px; }
+  .profile dt { color: var(--ink-soft); font-size: .88rem; }
+  .profile dd { font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--line); }
+  th { background: var(--ink); color: #fff; font-weight: 600; font-size: .9rem; }
+  tbody tr:nth-child(even) { background: #f6f9fb; }
+  tfoot td { font-weight: 700; background: #eaf1f5; }
+  td.num, th.num { text-align: right; }
+
+  .alert { padding: 12px 14px; border-radius: 8px; font-weight: 600; }
+  .alert.pass { background: var(--pass-bg); color: var(--pass-fg); border-left: 5px solid var(--pass-fg); }
+  .alert.fail { background: var(--fail-bg); color: var(--fail-fg); border-left: 5px solid var(--fail-fg); }
+
+  footer { text-align: center; color: var(--ink-soft); font-size: .85rem; padding: 20px; }
+
+  /* ---------- Responsive (media queries) ---------- */
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .bar { flex-direction: column; align-items: flex-start; }
+    nav a { margin: 0 14px 0 0; }
+    section { padding: 18px; }
+    button { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <h1>Student Registration &amp; Result Portal</h1>
+    <nav>
+      <a href="#register">Register</a>
+      <a href="#results">Results</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ================= Registration form ================= -->
+  <section id="register">
+    <h2>Student registration</h2>
+    <p class="hint">Fill in all fields. Marks are out of 100.</p>
+
+    <form id="regForm">
+      <fieldset>
+        <legend>Personal details</legend>
+        <div class="row">
+          <div class="field">
+            <label for="name">Full name</label>
+            <input type="text" id="name" required minlength="3" pattern="[A-Za-z ]+" placeholder=" ">
+            <small>Letters and spaces only.</small>
+          </div>
+          <div class="field">
+            <label for="roll">Roll number</label>
+            <input type="text" id="roll" required pattern="[A-Za-z0-9]{6,12}" placeholder=" ">
+            <small>6–12 letters or digits.</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" required placeholder=" ">
+          </div>
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" required pattern="[6-9][0-9]{9}" placeholder=" ">
+            <small>10 digits, starting with 6–9.</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="dob">Date of birth</label>
+            <input type="date" id="dob" required max="2010-12-31">
+          </div>
+          <div class="field">
+            <label for="course">Course</label>
+            <select id="course" required>
+              <option value="">Select a course</option>
+              <option>B.E. Computer Science &amp; Engineering</option>
+              <option>B.Tech AI &amp; Data Science</option>
+              <option>B.Tech Information Technology</option>
+              <option>B.E. Electronics &amp; Communication</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Marks</legend>
+        <div class="row">
+          <div class="field">
+            <label for="m1">Mathematics</label>
+            <input type="number" id="m1" required min="0" max="100" placeholder=" ">
+          </div>
+          <div class="field">
+            <label for="m2">Data Structures</label>
+            <input type="number" id="m2" required min="0" max="100" placeholder=" ">
+          </div>
+          <div class="field">
+            <label for="m3">Database Systems</label>
+            <input type="number" id="m3" required min="0" max="100" placeholder=" ">
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="m4">Machine Learning</label>
+            <input type="number" id="m4" required min="0" max="100" placeholder=" ">
+          </div>
+          <div class="field">
+            <label for="m5">Web Technologies</label>
+            <input type="number" id="m5" required min="0" max="100" placeholder=" ">
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="buttons">
+        <button type="submit" class="primary">Show result</button>
+        <button type="reset" class="secondary" id="resetBtn">Clear form</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ================= Result display ================= -->
+  <section id="results" aria-live="polite">
+    <h2>Result sheet</h2>
+    <p class="hint">Your details and marks appear here after you submit the form.</p>
+    <div id="output">
+      <div class="empty">No result yet. Complete the registration form to see it.</div>
+    </div>
+  </section>
+</main>
+
+<footer>Mini project &ndash; HTML5 &amp; CSS3</footer>
+
+<!-- Small script: copies the form values into the result section -->
+<script>
+  const form = document.getElementById("regForm");
+  const output = document.getElementById("output");
+  const subjects = ["Mathematics", "Data Structures", "Database Systems", "Machine Learning", "Web Technologies"];
+  const PASS_MARK = 40;
+
+  function grade(m) {
+    if (m >= 90) return "O";
+    if (m >= 80) return "A+";
+    if (m >= 70) return "A";
+    if (m >= 60) return "B";
+    if (m >= 50) return "C";
+    if (m >= PASS_MARK) return "D";
+    return "F";
+  }
+
+  // Escape user text before placing it in HTML
+  function esc(s) {
+    const d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();               // HTML5 validation has already run
+    const v = id => document.getElementById(id).value.trim();
+
+    const marks = [1, 2, 3, 4, 5].map(i => Number(v("m" + i)));
+    const total = marks.reduce((a, b) => a + b, 0);
+    const pct = (total / (marks.length * 100) * 100).toFixed(2);
+    const passed = marks.every(m => m >= PASS_MARK);
+
+    const rows = marks.map((m, i) =>
+      `<tr><td>${subjects[i]}</td><td class="num">${m}</td><td>${grade(m)}</td></tr>`
+    ).join("");
+
+    output.innerHTML = `
+      <dl class="profile">
+        <dt>Name</dt><dd>${esc(v("name"))}</dd>
+        <dt>Roll number</dt><dd>${esc(v("roll").toUpperCase())}</dd>
+        <dt>Email</dt><dd>${esc(v("email"))}</dd>
+        <dt>Phone</dt><dd>${esc(v("phone"))}</dd>
+        <dt>Date of birth</dt><dd>${esc(v("dob"))}</dd>
+        <dt>Course</dt><dd>${esc(v("course"))}</dd>
+      </dl>
+      <table>
+        <thead><tr><th>Subject</th><th class="num">Marks</th><th>Grade</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td>Total</td><td class="num">${total} / ${marks.length * 100}</td><td>${pct}%</td></tr></tfoot>
+      </table>
+      <div class="alert ${passed ? "pass" : "fail"}">
+        ${passed ? "Result: Pass. Congratulations!" : "Result: Fail. Minimum " + PASS_MARK + " marks needed in every subject."}
+      </div>`;
+    output.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  form.addEventListener("reset", function () {
+    output.innerHTML = '<div class="empty">No result yet. Complete the registration form to see it.</div>';
+  });
+</script>
+</body>
+</html>
